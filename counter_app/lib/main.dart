@@ -1,5 +1,16 @@
+import 'package:budget_tracker/pages/Loading.dart';
+import 'package:budget_tracker/pages/all_expenses.dart';
+import 'package:budget_tracker/pages/categories.dart';
+import 'package:budget_tracker/pages/exepenses.dart';
+import 'package:budget_tracker/pages/login.dart';
+import 'package:budget_tracker/pages/register.dart';
+import 'package:budget_tracker/pages/wrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'firebase_options.dart';
+import 'pages/home.dart';
+import 'pages/profile.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -13,74 +24,45 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
-  int counter=0;
-  bool dark=false;
+
+  User? user;
+  bool load=true;
+  int a=-1;
+  Future  getcurrentuser() async{
+    // print('1');
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    this.user=await FirebaseAuth.instance.currentUser;
+    if(user==null)
+    {
+      a=1;
+    }
+    else
+    {
+      a=0;
+    }
+    setState(() {
+      load=false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
+    getcurrentuser();
     return MaterialApp(
-      home: Scaffold(
-        backgroundColor: dark? Colors.grey[850]: Colors.grey[300],
-        appBar: AppBar(title: Center(child: Text('Counter App',style: TextStyle(color: dark? Colors.white: Colors.black ),)),
-        backgroundColor: dark? Colors.black: Colors.grey[400],),
-        body: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: dark? Colors.white: Colors.grey[800],),onPressed: (){setState(() {
-                      dark=!dark;
-                    });},
-                    child: dark? Text("Light mode",style: TextStyle(color:Colors.black)) : Text("Dark mode",style: TextStyle(color:Colors.grey[300]) ,)
-                    ),
-              )],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(100.0),
-              child: Center(
-                child: CircleAvatar(
-                  backgroundColor: dark? Colors.grey[300] : Colors.black,
-                  radius: 80,
-                  child: Text(counter.toString(),
-                  style: TextStyle(
-                    fontSize: 50
-                  ),),
-                ),
-              ),
-            ),
-          ],
-        ),
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(40),
-              child: FloatingActionButton(
-                backgroundColor: Colors.red,
-                onPressed: (){setState(() {
-                  counter=counter+1;
-                });},
-                child: Icon(Icons.add),
-              ),
-            )
-            ,
-            Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: FloatingActionButton(
-                backgroundColor: Colors.red,
-                onPressed: (){setState(() {
-                  counter=counter-1;
-                });},
-                child: Icon(Icons.remove),
-              ),
-            )
-          ],
-        ),
-        // floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      ),
+      home: load?loading():wrapper(a: a,),
+      routes:
+      {
+        '/home': (context) {return home();},
+        '/profile': (context){return profile();},
+        '/category': (context){return category();},
+        '/expenses':(context){return expenses();},
+        '/login':(context) =>login(),
+        '/register': (context) =>register(),
+        '/allExpense':(context)=>all_expenses()
+      },
+      debugShowCheckedModeBanner: false,
     );
   }
 }
-
 

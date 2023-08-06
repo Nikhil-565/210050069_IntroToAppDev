@@ -1,4 +1,4 @@
-# counter_app
+# budget_tracker
 
 A new Flutter project.
 
